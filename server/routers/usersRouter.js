@@ -5,29 +5,21 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 UserRoute.route('/create-user').post((req, res, next) => {
-    const hashPassword = bcrypt.hash(req.body.password, 12);
-    const hashPasswordConfirm = bcrypt.hash(req.body.cpassword, 12);
-    const joinPassword = bcrypt.hash(hashPassword, 12);
-    const joinPasswordConfirm = bcrypt.hash(hashPasswordConfirm, 12);
     const userRegister = new User({
         fname: req.body.fname,
         lname: req.body.lname,
         email: req.body.email,
         phone: req.body.phone,
         username: req.body.username,
-        password: joinPassword,
-        cpassword: joinPasswordConfirm,
+        password: bcrypt.hash(req.body.password, 12),
+        cpassword: bcrypt.hash(req.body.cpassword, 12),
         gender: req.body.gender,
         picture: req.body.picture
     })
     userRegister.save(err => {
         if (err) {
+            console.log(err)
             return res.status(400).json({
-                title: 'error',
-                error: 'Username in used'
-            })
-        } else if (err) {
-            return res.status(401).json({
                 title: 'error',
                 error: 'Email in used'
             })
@@ -67,3 +59,5 @@ UserRoute.route('/login-user').post((req, res, next) => {
         })
     })
 })
+
+module.exports = UserRoute
