@@ -33,3 +33,28 @@ UserRoute.route('/create-user').post((req, res, next) => {
         })
     })
 })
+
+UserRoute.route('/login-user').post((req, res, next) => {
+    User.findOne({ username: req.body.email }, (err, user) => {
+        if (err) return res.status(500).json({
+            title: 'Server Error',
+            error: err
+        })
+        //อีเมลไม่ถูกต้อง
+        if (!user) {
+            return res.status(401).json({
+                title: 'อีเมลไม่ถูกต้อง',
+                error: 'Invalid Credentails'
+            })
+        }
+        //รหัสไม่ถูกต้อง
+        if(!bcrypt.compare(req.body.password, user.password)) {
+            return res.status(401).json({
+                title: 'รหัสผ่านไม่ถูกต้อง',
+                error: 'Invalid Credentails'
+            })
+        }
+
+        let token = jwt.sign({ userId: user._id }, )
+    })
+})
