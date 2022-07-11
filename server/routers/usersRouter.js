@@ -3,7 +3,7 @@ const express = require('express');
 const UserRoute = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+require('dotenv').config();
 UserRoute.route('/create-user').post((req, res, next) => {
     const userRegister = new User({
         fname: req.body.fname,
@@ -11,8 +11,8 @@ UserRoute.route('/create-user').post((req, res, next) => {
         email: req.body.email,
         phone: req.body.phone,
         username: req.body.username,
-        password: bcrypt.hash(req.body.password, 12),
-        cpassword: bcrypt.hash(req.body.cpassword, 12),
+        password: bcrypt.hashSync(req.body.password, 12),
+        cpassword: bcrypt.hashSync(req.body.cpassword, 12),
         gender: req.body.gender,
         picture: req.body.picture
     })
@@ -20,7 +20,7 @@ UserRoute.route('/create-user').post((req, res, next) => {
         if (err) {
             console.log(err)
             return res.status(400).json({
-                title: 'error',
+                title: 'Error',
                 error: 'Email in used'
             })
         }
@@ -31,7 +31,7 @@ UserRoute.route('/create-user').post((req, res, next) => {
 })
 
 UserRoute.route('/login-user').post((req, res, next) => {
-    User.findOne({ username: req.body.email }, (err, user) => {
+    User.findOne({ email: req.body.email }, (err, user) => {
         if (err) return res.status(500).json({
             title: 'Server Error',
             error: err
@@ -52,7 +52,7 @@ UserRoute.route('/login-user').post((req, res, next) => {
         }
 
         let token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET,
-            {expiresIn : JWT_EXPIRES_IN} )
+            {expiresIn : process.env.JWT_EXPIRES_IN} )
         return res.status(200).json({
             title: 'login sucess',
             token: token
