@@ -5,14 +5,18 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 UserRoute.route('/create-user').post((req, res, next) => {
-    const hash = bcrypt.hash(req.body.cpassword, 12);
+    const hashPassword = bcrypt.hash(req.body.password, 12);
+    const hashPasswordConfirm = bcrypt.hash(req.body.cpassword, 12);
+    const joinPassword = bcrypt.hash(hashPassword, 12);
+    const joinPasswordConfirm = bcrypt.hash(hashPasswordConfirm, 12);
     const userRegister = new User({
         fname: req.body.fname,
         lname: req.body.lname,
         email: req.body.email,
         phone: req.body.phone,
         username: req.body.username,
-        password: bcrypt.hash(hash, 12),
+        password: joinPassword,
+        cpassword: joinPasswordConfirm,
         gender: req.body.gender,
         picture: req.body.picture
     })
@@ -55,6 +59,11 @@ UserRoute.route('/login-user').post((req, res, next) => {
             })
         }
 
-        let token = jwt.sign({ userId: user._id }, )
+        let token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET,
+            {expiresIn : JWT_EXPIRES_IN} )
+        return res.status(200).json({
+            title: 'login sucess',
+            token: token
+        })
     })
 })

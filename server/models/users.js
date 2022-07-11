@@ -27,6 +27,10 @@ const userSchema = mongoose.Schema({
         type: String,
         require: true
     },
+    cpassword: {
+        type: String,
+        require: true
+    },
     gender: {
         type: Number,
         require: true
